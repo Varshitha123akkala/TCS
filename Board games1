@@ -1,0 +1,50 @@
+from collections import deque
+
+def is_within_grid(x, y, M, N):
+    return 0 <= x < M and 0 <= y < N
+
+def min_moves_to_destination(grid, M, N, src, dest, move_rule):
+    dx, dy = move_rule
+    src_x, src_y = src
+    dest_x, dest_y = dest
+
+    # BFS queue stores (current_x, current_y, moves)
+    queue = deque([(src_x, src_y, 0)])
+    visited = set()  # To keep track of visited cells
+    visited.add((src_x, src_y))
+
+    while queue:
+        x, y, moves = queue.popleft()
+
+        # If we reached the destination, return the number of moves
+        if (x, y) == (dest_x, dest_y):
+            return moves
+
+        # Generate the next possible cells based on movement rules
+        directions = [
+            (x + dx, y + dy),        # Forward
+            (x + dy, y - dx),        # Right
+            (x - dy, y + dx),        # Left
+            (x - dx, y - dy)         # Back
+        ]
+
+        for nx, ny in directions:
+            if (is_within_grid(nx, ny, M, N) and 
+                grid[nx][ny] == 0 and 
+                (nx, ny) not in visited):
+                visited.add((nx, ny))
+                queue.append((nx, ny, moves + 1))
+
+    # If destination is not reachable, return -1
+    return -1
+
+# Input Reading
+M, N = map(int, input().split())
+grid = [list(map(int, input().split())) for _ in range(M)]
+src = tuple(map(int, input().split()))
+dest = tuple(map(int, input().split()))
+move_rule = tuple(map(int, input().split()))
+
+# Output the minimum moves required
+result = min_moves_to_destination(grid, M, N, src, dest, move_rule)
+print(result)
