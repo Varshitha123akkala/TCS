@@ -1,0 +1,46 @@
+def dfs(employee, graph, visited):
+    stack = [employee]
+    total_expertise = 0
+    
+    while stack:
+        node = stack.pop()
+        if not visited[node]:
+            visited[node] = True
+            total_expertise += expertise[node]
+            for neighbor in graph[node]:
+                if not visited[neighbor]:
+                    stack.append(neighbor)
+    
+    return total_expertise
+
+def max_expertise(n, c, conflicts, expertise):
+    # Create a graph
+    graph = [[] for _ in range(n + 1)]
+    
+    # Populate the graph with conflicts
+    for emp1, emp2 in conflicts:
+        graph[emp1].append(emp2)
+        graph[emp2].append(emp1)
+    
+    visited = [False] * (n + 1)
+    max_total_expertise = 0
+    
+    # Find all connected components and calculate expertise
+    for employee in range(1, n + 1):
+        if not visited[employee]:
+            total_expertise = dfs(employee, graph, visited)
+            max_total_expertise = max(max_total_expertise, total_expertise)
+    
+    return max_total_expertise
+
+# Input
+n, c = map(int, input().strip().split())
+conflicts = [tuple(map(int, input().strip().split())) for _ in range(c)]
+expertise = list(map(int, input().strip().split()))
+
+# Adjust expertise to be 1-indexed
+expertise = [0] + expertise  # Adding a dummy value at index 0 for 1-indexed employee
+
+# Calculate and print the maximum expertise
+result = max_expertise(n, c, conflicts, expertise)
+print(result)
